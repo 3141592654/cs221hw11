@@ -4,4 +4,5 @@ I used mostly the same parameters Eitan used; num_iter=9,000,000; pop_size=1000;
 
 Threads						1			2			4			8 (more threads than I have cores on my laptop)
 1-deme parallelism (extracredit)	57.5s7590		42.2s5964		42.0s7170		51.4s6740
-n-deme parallelism 				62.5s7023		30.4s6386		26.5s/5876	29.1s5640
+n-deme parallelism				62.5s7023		30.4s6386		26.5s/5876	29.1s5640
+(Format is runtime in seconds, result in arbitrary distance units).
