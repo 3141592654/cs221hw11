@@ -173,7 +173,7 @@ ga_search(const Cities& cities,
 {
   auto best_dist = 1e100;// + nthread; // Eliminate silly warning
   auto best_ordering = Cities::permutation_t(cities.size());
-  auto run_one_thread[&]() {
+  auto run_one_thread = [&]() {
 
   TournamentDeme deme(&cities, pop_size, mutation_rate);
 
@@ -188,7 +188,8 @@ ga_search(const Cities& cities,
       best_ordering = ordering;
     }
   }
-  }
+  };
+  std::vector<std::thread> threads;
   for (unsigned i = 0; i < nthread; ++i) {
     threads.push_back(std::thread(run_one_thread));
   }
