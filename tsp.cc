@@ -195,14 +195,14 @@ ga_search(const Cities& cities,
         personal_best_ordering=ordering;
         // distinguish between personal best increases and overall best
         // increases. (something that is_improved notably doesn't do). for 110%
-        // readability, could put a mutex lock here so that there are no race
-        // conditions for std::cout. it might also be nice to see which thread
-        // is doing the printing.
+        // readability, could put a mutex lock here so that there are no garbled
+        // outputs for std::cout. it might also be nice to see which thread is
+        // doing the printing.
         std::cout << "thread: " << i << " " << personal_best_dist << std::endl;
        }
     }
     // See if the personal best is better than the best overall.
-    best_mutex.lock();
+    auto guard = std::lock_guard(best_mutex);
     if (personal_best_dist < best_dist) {
       best_dist=personal_best_dist;
       best_ordering=personal_best_ordering;
@@ -210,7 +210,6 @@ ga_search(const Cities& cities,
     } else {
       std::cout << "no improvement\n";
     }
-    best_mutex.unlock();
  };
   // copy-pasted from granular_randomized_search
   std::vector<std::thread> threads;
