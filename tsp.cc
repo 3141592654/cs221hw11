@@ -171,28 +171,30 @@ ga_search(const Cities& cities,
           double mutation_rate,
           unsigned nthread = 1)
 {
-  auto best_dist = 1e100;// + nthread; // Eliminate silly warning
+  auto best_dist = 1e100;
   auto best_ordering = Cities::permutation_t(cities.size());
   auto run_one_thread = [&]() {
 
-  TournamentDeme deme(&cities, pop_size, mutation_rate);
+    TournamentDeme deme(&cities, pop_size, mutation_rate);
 
-  // Evolve the population to make it fitter and keep track of
-  // the shortest distance generated
-  for (long i = 1; i <= iters/pop_size; ++i) {
-    deme.compute_next_generation();    // generate next generation
+    // Evolve the population to make it fitter and keep track of
+    // the shortest distance generated
+    for (long i = 1; i <= iters/pop_size; ++i) {
+      deme.compute_next_generation();    // generate next generation
 
-    // Find best individual in this population
-    const auto ordering = deme.get_best()->get_ordering();
-    if (is_improved(cities, ordering, best_dist, i * pop_size)) {
-      best_ordering = ordering;
+      // Find best individual in this population
+      const auto ordering = deme.get_best()->get_ordering();
+      if (is_improved(cities, ordering, best_dist, i * pop_size)) {
+         best_ordering = ordering;
+      }
     }
-  }
-  };
+ };
+  // copy-pasted from granular_randomized_search
   std::vector<std::thread> threads;
   for (unsigned i = 0; i < nthread; ++i) {
     threads.push_back(std::thread(run_one_thread));
   }
+
   for (auto& t : threads) {
     t.join();
   }
@@ -215,7 +217,7 @@ int main(int argc, char** argv)
   const auto nthread = (argc > 4)? atoi(argv[4]) : 1;
   const auto granularity = (argc > 5)? atoi(argv[5]) : 100;
 
-  constexpr unsigned NUM_ITER = 2'000'000;
+  constexpr unsigned NUM_ITER = 2'000'0;
 
 
 //  const auto best_ordering = exhaustive_search(cities);
