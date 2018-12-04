@@ -184,7 +184,11 @@ ga_search(const Cities& cities,
      TournamentDeme deme(&cities, pop_size, mutation_rate);
     // The more threads, the fewer mutations each thread's deme makes
     // (because otherwise it would be impossible to cut down on runtime by
-    // adding more threads).
+    // adding more threads). This doesn't quite keep the number of iterations
+    // the same since iters/pop_size is not necessarily divisible by nthread.
+    // the maximum error is nthread^2. If you really need threads for
+    // performance reasons, you will be running a high number of iters, in which
+    // case this error will be negligible.
     for (long i = 1; i <= iters/(pop_size*nthread); ++i) {
       deme.compute_next_generation();
       // Find best individual in this population
