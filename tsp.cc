@@ -175,6 +175,7 @@ ga_search(const Cities& cities,
   auto best_dist = 1e100;
   auto best_ordering = Cities::permutation_t(cities.size());
   auto best_mutex = std::mutex();
+  std::atomic<long> i = 1;
   auto run_one_thread = [&]() {
     // each deme computes its own best independently of the others.
     auto personal_best_ordering = Cities::permutation_t(cities.size());
@@ -182,14 +183,11 @@ ga_search(const Cities& cities,
     // Evolve the population to make it fitter and keep track of
     // the shortest distance generated.
      TournamentDeme deme(&cities, pop_size, mutation_rate);
-    // The more threads, the fewer mutations each thread's deme makes
-    // (because otherwise it would be impossible to cut down on runtime by
-    // adding more threads). This doesn't quite keep the number of iterations
-    // the same since iters/pop_size is not necessarily divisible by nthread.
-    // the maximum error is nthread^2. If you really need threads for
-    // performance reasons, you will be running a high number of iters, in which
-    // case this error will be negligible.
-    for (long i = 1; i <= iters/(pop_size*nthread); ++i) {
+    // This will run slightly more iterations than the parallel version. another
+    // approach would be to have i non-atomic and have it <=
+    // iters/(pop_size*nthread). This gives a slight (at most, nthread^2)
+    // undercount. Neither really matters.
+    for (; i <= iters/pop_size; ++i) {
       deme.compute_next_generation();
       // Find best individual in this population
       const auto ordering = deme.get_best()->get_ordering();
